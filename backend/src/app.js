@@ -9,6 +9,7 @@ app.use(express.json())
 
 app.use('/api/news', newsRoutes)
 
+
 app.use(notFound) // NotFound
 app.use(errorHandler) // ErrorHandler
 
