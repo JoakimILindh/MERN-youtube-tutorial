@@ -36,7 +36,10 @@ export const deleteComment = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: `Can't find what you are looking for` })
   }
 
-  // TODO: kolla om användaren äger commentaren eller om Admin
+  if(comment.user.toString() !== req.user._id && req.user.role !== "admin" && req.user.role !== "moderator") {
+    return res.status(403).json({ mesasage: 'You are not allowed to delete this comment' })
+  }
+
 
   const thread = await Thread.findById(comment.thread).exec()
   thread.comments = thread.comments.filter(c => c.toString() !== id)

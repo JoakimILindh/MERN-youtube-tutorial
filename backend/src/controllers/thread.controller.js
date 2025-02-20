@@ -6,6 +6,7 @@ export const createThread = asyncHandler(async (req, res) => {
   const { title, content } = req.body;
   const user = req.user._id;
 
+  console.log({user})
 
   if(!title || !content) {
     return res.status(400).json({ message: "title and content are required"})
@@ -24,7 +25,7 @@ export const getThreads = asyncHandler(async (req, res) => {
         path: "user",
         select: "name"
       }
-    })
+    }).exec()
 
   res.status(200).json(threads)
 })
@@ -61,12 +62,17 @@ export const deleteThread = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "invalid id" })
   }
 
-  // TODO: Ändra så man kan ta bort sin egen eller om man är Admin
+  const thread = Thread.findById(id).exec()
 
-  const thread = await Thread.findByIdAndDelete(id).exec()
   if(!thread) {
     return res.status(404).json({ message: `Can't find that thread`})
   }
+
+  if(thread.user.toString() !== req.user._id && req.user.role !== "admin" && req.user.role !== "moderator") {
+    return res.status(403).json({ mesasage: 'You are not allowed to delete this thread' })
+  }
+
+  await Thread.deleteOne({ _id: id }).exec();
 
   res.sendStatus(204)
 })

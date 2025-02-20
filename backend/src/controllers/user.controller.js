@@ -2,6 +2,7 @@ import User from '../models/user.model.js'
 import asyncHandler from 'express-async-handler'
 import bcrypt from 'bcryptjs'
 import { generateToken } from '../lib/generateToken.js';
+import ROLES from '../constants/roles.js';
 
 export const register = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -62,4 +63,30 @@ export const getUserProfile = asyncHandler(async (req, res) => {
   }
 
   res.status(200).json(user)
+})
+
+export const updateRole = asyncHandler(async (req, res) => {
+  const { role } = req.body
+
+  const rolesArray = Object.values(ROLES)
+
+  if(!role) {
+    return res.status(400).json({ message: `Please enter a role. (${rolesArray.join(', ')})` })
+  }
+
+  const normalizedRole = role.trim().toLowerCase()
+  if(!rolesArray.includes(normalizedRole)) {
+    return res.status(400).json({ message: `Roles must be one of the following. (${rolesArray.join(', ')})` })
+  }
+
+  const user = await User.findById(req.params.id).exec()
+
+  if(!user) {
+    return res.status(404).json({ message: 'User not found' })
+  }
+
+  user.role = normalizedRole;
+  await user.save()
+
+  res.status(200).json({ message: 'Role updated to ' + normalizedRole })
 })
