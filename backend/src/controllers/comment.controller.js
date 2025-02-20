@@ -6,13 +6,14 @@ import asyncHandler from 'express-async-handler'
 
 export const createComment = asyncHandler(async (req, res) => {
   const { content } = req.body;
+  const user = req.user._id
   const threadId = req.params.threadId
 
   if(!content) {
     return res.status(400).json({ message: "Content is required" })
   }
 
-  const comment = await Comment.create({ content, thread: threadId })
+  const comment = await Comment.create({ content, thread: threadId, user })
 
   const thread = await Thread.findById(threadId).exec()
   thread.comments.push(comment._id)

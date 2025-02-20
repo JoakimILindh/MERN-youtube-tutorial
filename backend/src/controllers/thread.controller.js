@@ -4,20 +4,29 @@ import asyncHandler from 'express-async-handler'
 
 export const createThread = asyncHandler(async (req, res) => {
   const { title, content } = req.body;
+  const user = req.user._id;
+
 
   if(!title || !content) {
     return res.status(400).json({ message: "title and content are required"})
   }
 
-  const thread = await Thread.create({ title, content })
+  const thread = await Thread.create({ title, content, user })
   res.status(201).json(thread)
 })
 
 export const getThreads = asyncHandler(async (req, res) => {
   const threads = await Thread.find()
-    .populate('comments')
+    .populate("user", "name")
+    .populate({
+      path: "comments",
+      populate: {
+        path: "user",
+        select: "name"
+      }
+    })
 
-  res.status(201).json(threads)
+  res.status(200).json(threads)
 })
 
 export const updateThread = asyncHandler(async (req, res) => {
@@ -37,8 +46,7 @@ export const updateThread = asyncHandler(async (req, res) => {
   }
 
 
-  // TODO: ändra query så man bara kan ta bort sina egna
-  const thread = await Thread.findByIdAndUpdate(id, toUpdate, { new: true }).exec()
+  const thread = await Thread.findOneAndUpdate({ _id: id, user: req.user._id }, toUpdate, { new: true }).exec()
   if(!thread) {
     return res.status(404).json({ message: `Can't find that thread`})
   }
@@ -52,6 +60,8 @@ export const deleteThread = asyncHandler(async (req, res) => {
   if(!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: "invalid id" })
   }
+
+  // TODO: Ändra så man kan ta bort sin egen eller om man är Admin
 
   const thread = await Thread.findByIdAndDelete(id).exec()
   if(!thread) {
