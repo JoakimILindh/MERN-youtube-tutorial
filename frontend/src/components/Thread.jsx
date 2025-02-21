@@ -3,14 +3,17 @@ import formatDate from '../lib/formatDate'
 import { useAuth } from '../contexts/authContext'
 
 
-const Thread = ({ thread }) => {
+const Thread = ({ thread, handleAddComment }) => {
 
   const [showComments, setShowComments] = useState(false)
+  const [comment, setComment] = useState('')
 
   const { user } = useAuth()
 
   const handleSubmit = e => {
     e.preventDefault()
+    handleAddComment(thread._id, comment)
+    setComment('')
   }
 
   console.log(thread)
@@ -26,7 +29,7 @@ const Thread = ({ thread }) => {
         </div>
         <div className='h-0 border-b my-5' />
         <form onSubmit={handleSubmit} className='flex items-center gap-2'>
-          <input type="text" className='border rounded-lg py-1 px-2 w-full' />
+          <input type="text" className='border rounded-lg py-1 px-2 w-full' value={comment} onChange={e => setComment(e.target.value)} />
           <button className='btn'>Comment</button>
         </form>
       </div>
