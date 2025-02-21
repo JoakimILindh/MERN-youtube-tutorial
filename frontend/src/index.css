@@ -4,3 +4,7 @@
 .wrapper {
   @apply container mx-auto px-4;
 }
+
+.btn {
+  @apply bg-black/30 px-10 py-1.5 rounded-lg cursor-pointer hover:bg-black/50;
+}

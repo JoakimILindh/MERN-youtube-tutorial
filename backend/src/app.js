@@ -11,17 +11,18 @@ import cors from 'cors'
 const app = express()
 
 
-const whitelist = ['http://localhost:5173', 'http://localhost:8080']
+const whitelist = ['http://localhost:5173', 'http://localhost:8080', '*']
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if(whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
-}))
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     if(whitelist.indexOf(origin) !== -1) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error('Not allowed by CORS'))
+//     }
+//   }
+// }))
+app.use(cors())
 
 app.use(express.json())
 

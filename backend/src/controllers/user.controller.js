@@ -90,3 +90,11 @@ export const updateRole = asyncHandler(async (req, res) => {
 
   res.status(200).json({ message: 'Role updated to ' + normalizedRole })
 })
+
+export const checkToken = asyncHandler(async (req, res) => {
+  res.status(200).json({
+    _id: req.user._id, 
+    name: req.user.name,
+    role: req.user.role
+  })
+})
