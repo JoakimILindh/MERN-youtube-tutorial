@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Comment from '../models/comment.model.js'
 import Thread from '../models/thread.model.js';
+import Notification from '../models/notification.model.js';
 
 import asyncHandler from 'express-async-handler'
 
@@ -19,6 +20,15 @@ export const createComment = asyncHandler(async (req, res) => {
   thread.comments.push(comment._id)
 
   await thread.save()
+
+  if(thread.user.toString() !== req.user._id) {
+    await Notification.create({
+      recipient: thread.user,
+      sender: req.user._id,
+      message: 'Commented on your thread',
+      thread: thread._id
+    })
+  }
 
   res.status(201).json(comment)
 })
