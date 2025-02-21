@@ -2,12 +2,18 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router'
-import RootLayout from './layouts/RootLayout'
-import HomePage from './pages/HomePage'
-import AuthLayout from './layouts/AuthLayout'
-import LoginPage from './pages/loginPage'
-import RegisterPage from './pages/registerPage'
 import AuthContextProvider from './contexts/authContext'
+import RootLayout from './layouts/RootLayout'
+import AuthLayout from './layouts/AuthLayout'
+import PrivateLayout from './layouts/PrivateLayout'
+import AdminLayout from './layouts/AdminLayout'
+
+import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
+import ThreadsPage from './pages/ThreadsPage'
+import ProfilePage from './pages/ProfilePage'
+import AdminPage from './pages/AdminPage'
 
 const router = createBrowserRouter([
   {
@@ -25,6 +31,30 @@ const router = createBrowserRouter([
           {
             path: 'register',
             element: <RegisterPage />
+          }
+        ]
+      },
+
+      {
+        element: <PrivateLayout />,
+        children: [
+          {
+            path: 'threads',
+            element: <ThreadsPage />
+          },
+          {
+            path: 'profile',
+            element: <ProfilePage />
+          },
+          {
+            path: 'admin',
+            element: <AdminLayout />,
+            children: [
+              {
+                index: true,
+                element: <AdminPage />
+              }
+            ]
           }
         ]
       }

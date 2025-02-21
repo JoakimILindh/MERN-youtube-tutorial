@@ -11,7 +11,6 @@ const AuthContextProvider = ({ children }) => {
   const [authReady, setAuthReady] = useState(false)
   const [rememberUser, setRememberUser] = useState(false)
 
-  console.log(user)
 
   useEffect(() => {
     const checkToken = async () => {

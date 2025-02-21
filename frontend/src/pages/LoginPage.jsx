@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link, useNavigate } from "react-router"
+import { Link, useLocation, useNavigate } from "react-router"
 import { useAuth } from "../contexts/authContext"
 import { RiLoaderFill } from "react-icons/ri";
 
@@ -14,6 +14,8 @@ const LoginPage = () => {
 
   const { login, rememberUser, toggleRememberUser } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+
 
   const handleSubmit = async e => {
     e.preventDefault()
@@ -26,7 +28,7 @@ const LoginPage = () => {
     setError('')
     try {
       await login(credentials)
-      navigate('/')
+      navigate(location.state?.from || '/')
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong')
     } finally {
