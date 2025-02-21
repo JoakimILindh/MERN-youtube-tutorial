@@ -8,8 +8,8 @@ const HomePage = () => {
   useEffect(() => {
     const getNews = async () => {
       const res = await axios.get('api/news')
+      console.log(res)
       if(res.status !== 200) return
-
 
       setNews(res.data)
     }
