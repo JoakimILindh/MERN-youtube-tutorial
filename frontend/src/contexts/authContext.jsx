@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "../api/axios";
-
+import { io } from 'socket.io-client'
 
 export const AuthContext = createContext()
 
@@ -10,7 +10,7 @@ const AuthContextProvider = ({ children }) => {
   const [token, setToken] = useState(null)
   const [authReady, setAuthReady] = useState(false)
   const [rememberUser, setRememberUser] = useState(false)
-
+  const [socket, setSocket] = useState(null)
 
   useEffect(() => {
     const checkToken = async () => {
@@ -30,6 +30,7 @@ const AuthContextProvider = ({ children }) => {
         if(res.status === 200) {
           setToken(sessionStorage.getItem('jwt'))
           setUser(res.data)
+          connectSocket(res.data.name)
         }
 
       } catch (error) {
@@ -53,6 +54,7 @@ const AuthContextProvider = ({ children }) => {
         role: res.data.role
       })
     }
+    connectSocket(res.data.name)
     if(rememberUser) {
       sessionStorage.setItem('jwt', res.data.token)
     }
@@ -67,6 +69,7 @@ const AuthContextProvider = ({ children }) => {
         role: res.data.role
       })
     }
+    connectSocket(res.data.name)
     if(rememberUser) {
       sessionStorage.setItem('jwt', res.data.token)
     }
@@ -76,6 +79,7 @@ const AuthContextProvider = ({ children }) => {
     sessionStorage.removeItem('jwt')
     setToken(null)
     setUser(null)
+    disconnectSocket()
   }
 
   const toggleRememberUser = () => {
@@ -90,6 +94,26 @@ const AuthContextProvider = ({ children }) => {
     })
   }
 
+
+  const connectSocket = (username) => {
+    if(socket?.connected) return
+
+    const _socket = io('http://localhost:8080', {
+      query: {
+        user: username
+      }
+    })
+    _socket.connect()
+
+    setSocket(_socket)
+  }
+  const disconnectSocket = () => {
+    if(!socket) return
+    if(socket?.connected) {
+      socket.disconnect()
+    }
+  }
+
   const value = {
     user,
     token,
@@ -98,7 +122,8 @@ const AuthContextProvider = ({ children }) => {
     logout,
     rememberUser,
     toggleRememberUser,
-    authReady
+    authReady,
+    socket
   }
 
   return (

@@ -48,7 +48,7 @@ export default AvatarDropdown
 
 const AvatarDropdownNotifications = ({ isOpen, handleLogout, setIsOpen, notifications, setNotifications, unreadNotifications }) => {
   
-  const { user, token } = useAuth()
+  const { user, token, socket } = useAuth()
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -64,6 +64,39 @@ const AvatarDropdownNotifications = ({ isOpen, handleLogout, setIsOpen, notifica
     }
     fetchNotifications()
   }, [isOpen])
+
+  useEffect(() => {
+    if(!socket) return
+
+    socket.on('notification', (notification) => {
+      if(notification.recipient === user._id) {
+        const newNotificationsArr = [...notifications]
+        newNotificationsArr.push(notification)
+        setNotifications(newNotificationsArr)
+
+
+        // const fetchNotifications = async () => {
+        //   const res = await axios.get('api/notifications', {
+        //     headers: {
+        //       Authorization: `Bearer ${token}`
+        //     }
+        //   })
+    
+        //   if(res.status !== 200) return
+        //   setNotifications(res.data)
+    
+        // }
+        // fetchNotifications()
+
+        
+      }
+    })
+
+
+    return () => {
+      socket.off('notification')
+    }
+  }, [notifications])
 
   return (
     <div className={`absolute top-full mt-4 bg-indigo-950 right-0 border z-20 w-60 rounded-lg p-2 ${isOpen ? 'flex' : 'hidden'} flex-col gap-2 items-center`}>

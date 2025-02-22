@@ -4,6 +4,7 @@ import Thread from '../models/thread.model.js';
 import Notification from '../models/notification.model.js';
 
 import asyncHandler from 'express-async-handler'
+import { io } from '../server.js';
 
 export const createComment = asyncHandler(async (req, res) => {
   const { content } = req.body;
@@ -22,13 +23,16 @@ export const createComment = asyncHandler(async (req, res) => {
   await thread.save()
 
   if(thread.user.toString() !== req.user._id) {
-    await Notification.create({
+    const notification = await Notification.create({
       recipient: thread.user,
       sender: req.user._id,
       message: 'Commented on your thread',
       thread: thread._id
     })
+
+    io.emit('notification', notification)
   }
+
 
   res.status(201).json(comment)
 })

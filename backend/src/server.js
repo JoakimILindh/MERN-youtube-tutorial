@@ -1,8 +1,18 @@
 import app from './app.js'
 import mongoose from 'mongoose'
+import http from 'http'
+import { Server } from 'socket.io'
 
 const PORT = process.env.PORT || 8000;
 const MONGO_URI = process.env.MONGO_URI
+
+const server = http.createServer(app)
+
+const io = new Server(server, {
+  cors: {
+    origin: '*'
+  }
+})
 
 const dbConnect = async () => {
   try {
@@ -17,7 +27,7 @@ const dbConnect = async () => {
 const startServer = async () => {
   try {
     await dbConnect()
-    app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`))
+    server.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`))
   } catch (err) {
     console.log('Failed to start server:', err.message)
     process.exit(1)
@@ -25,3 +35,18 @@ const startServer = async () => {
 }
 
 startServer()
+
+io.on('connection', (socket) => {
+  
+  const userName = socket.handshake.query.user;
+  // console.log('a user connected: ' + socket.id)
+  console.log(`${userName} has connected`)
+
+
+  socket.on('disconnect', () => {
+    console.log(`${userName} has disconnected`)
+  })
+})
+
+
+export { io }
