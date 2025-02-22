@@ -71,7 +71,7 @@ const AvatarDropdownNotifications = ({ isOpen, handleLogout, setIsOpen, notifica
         {
           !!unreadNotifications.length
             ? unreadNotifications.map(notification => (
-              <Notification notification={notification} />
+              <Notification key={notification._id} notification={notification} />
             ))
             : <p className="text-sm text-center">No new notifications</p>
         }
@@ -86,9 +86,24 @@ const AvatarDropdownNotifications = ({ isOpen, handleLogout, setIsOpen, notifica
 
 const Notification = ({ notification }) => {
 
-  console.log(notification)
+  const { token } = useAuth()
+
+  const handleMouseOver = async () => {
+    if(notification.isRead) return
+
+    const res = await axios.patch(`api/notifications/${notification._id}`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    if(res.status === 204) {
+      notification.isRead = true
+    }
+  }
+
   return (
-    <Link to="/threads" className="block">
+    <Link to="/threads" className="block" onMouseOver={handleMouseOver}>
       <p className="text-sm font-semibold">{notification.sender.name}</p>
       <p className="text-xs">{notification.message}</p>
     </Link>

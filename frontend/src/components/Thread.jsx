@@ -3,7 +3,7 @@ import formatDate from '../lib/formatDate'
 import { useAuth } from '../contexts/authContext'
 
 
-const Thread = ({ thread, handleAddComment }) => {
+const Thread = ({ thread, handleAddComment, handleDeleteComment }) => {
 
   const [showComments, setShowComments] = useState(false)
   const [comment, setComment] = useState('')
@@ -16,7 +16,7 @@ const Thread = ({ thread, handleAddComment }) => {
     setComment('')
   }
 
-  console.log(thread)
+
   return (
     <div>
       <div className={`bg-black/20 p-3 ${!!thread.comments.length && showComments ? 'rounded-t-xl' : 'rounded-xl'} space-y-2`}>
@@ -45,8 +45,8 @@ const Thread = ({ thread, handleAddComment }) => {
                   <div className='flex items-center justify-between text-xs text-indigo-200'>
                     <p>By: {comment.user.name}</p>
                     {
-                      user._id === comment.user._id || user.role === 'admin' || user.role === 'moderator' && (
-                        <button className='text-red-500 text-xs cursor-pointer hover:underline'>Delete</button>
+                      (user._id === comment.user._id || user.role === 'admin' || user.role === 'moderator') && (
+                        <button onClick={() => handleDeleteComment(comment._id)} className='text-red-500 text-xs cursor-pointer hover:underline'>Delete</button>
                       )
                     }
                   </div>

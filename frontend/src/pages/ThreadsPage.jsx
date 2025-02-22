@@ -61,6 +61,29 @@ const ThreadsPage = () => {
     }
   }
 
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      
+      const res = await axios.delete(`api/comments/${commentId}`, {
+        headers: {
+          authorization: `Bearer ${token}`
+        }
+      })
+
+      if(res.status !== 204) return
+
+      const state = threads.map(thread => {
+        thread.comments = thread.comments.filter(comment => comment._id !== commentId)
+        return thread
+      })
+      setThreads(state)
+
+    } catch (err) {
+      console.log(err.response?.data?.message || err.message)
+    }
+  }
+
   return (
     <div className="wrapper">
       <div className="flex items-center justify-between">
@@ -71,7 +94,7 @@ const ThreadsPage = () => {
       {
         !!threads.length 
           ? threads.map(thread => (
-            <Thread key={thread._id} thread={thread} handleAddComment={handleAddComment} />
+            <Thread key={thread._id} thread={thread} handleAddComment={handleAddComment} handleDeleteComment={handleDeleteComment} />
           ))
           : (
             <div>No News to show</div>
