@@ -98,7 +98,7 @@ const AuthContextProvider = ({ children }) => {
   const connectSocket = (username) => {
     if(socket?.connected) return
 
-    const _socket = io('http://localhost:8080', {
+    const _socket = io(import.meta.env.MODE === 'development' ? 'http://localhost:8080/' : '/', {
       query: {
         user: username
       }
